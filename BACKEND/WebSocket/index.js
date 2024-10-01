@@ -7,48 +7,26 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-
 app.use(express.static("public"));
 
+io.on("connection", (socket) => {
+  console.log("connect to socket");
 
+  socket.on("chat", (msg) => {
+    socket.to(msg.sendId).emit("message", msg.sendMsg, msg.sendId);
+    console.log(msg.sendMsg, msg.sendId);
+  });
 
-io.on("connection" , (socket)=>{
-    console.log("connect to socket");
+  socket.on("disconnect", () => {
+    console.log("disconnected...");
+  });
+});
 
-    socket.on("register" , (user)=>
-    {
-        console.log(user);
-        console.log(user.id);
-
-        users[user.id];
-        console.log(users);
-        
-    })
-
-
-    socket.on("chat",(msg)=>
-    {
-        io.emit("message",msg);
-        console.log({msg});
-    })
-
-    socket.on("disconnect" , ()=>
-    {
-        console.log("disconnected...");
-    })
-    
-})
-
-
-
-const port = 8080
-server.listen(port , (err)=>
-{
-    if(err)
-    {
-        console.log(err);
-    }
-    else{
-        console.log("app running on port 8080");
-    }
-})
+const port = 8080;
+server.listen(port, (err) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("app running on port 8080");
+  }
+});

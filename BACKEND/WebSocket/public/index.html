@@ -16,9 +16,12 @@
     </center>
     <br />
     <center>
+        <input id="send-id" type="text" placeholder="Enter id..." />
+        <br>
         <input id="send-msg" type="text" placeholder="send message..." />
         <button onClick=sendMessage()>Send message</button>
         <br />
+        <p id="idd"></p>
         <div id="msg-container">
             <p>messge from sendr</p>
             <p>message from reciever</p>
@@ -29,20 +32,32 @@
 
         <script>
             const socket = io();
+            const idd = document.getElementById("idd");
+
+            socket.on("connect",() => {
+              console.log(socket.id);
+              idd.innerText = socket.id;
+            })
+
+
             const msgContainer = document.getElementById("msg-container");
             const msg = document.getElementById("send-msg");
+            const id = document.getElementById("send-id");
+
 
             function sendMessage() {
                 const sendMsg = msg.value;
-                msg.value = "";
-                console.log({ sendMsg });
-                socket.emit("chat", sendMsg)
+                const sendId = id.value;
+                // msg.value = "";
+                // id.value = "";
+                // console.log({ sendMsg, sendId });
+                socket.emit("chat", { sendMsg, sendId });
             }
+            
             socket.on("message", (data) => {
                 console.log({ data });
             })
 
-            socket.emit("register", { "user": { "id": "123qwer" } });
 
         </script>
 </body>
