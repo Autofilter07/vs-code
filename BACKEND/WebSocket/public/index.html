@@ -17,11 +17,13 @@
     <br />
     <center>
         <input id="send-id" type="text" placeholder="Enter id..." />
+        <button onClick=userId()>Send message</button>
         <br>
         <input id="send-msg" type="text" placeholder="send message..." />
         <button onClick=sendMessage()>Send message</button>
         <br />
         <p id="idd"></p>
+        <prev id="all-users"></prev>
         <div id="msg-container">
             <p>messge from sendr</p>
             <p>message from reciever</p>
@@ -33,10 +35,29 @@
         <script>
             const socket = io();
             const idd = document.getElementById("idd");
+            var mid;
 
-            socket.on("connect",() => {
-              console.log(socket.id);
-              idd.innerText = socket.id;
+
+
+
+            socket.on("connect", () => {
+                console.log(socket.id);
+                mid = socket.id;
+                idd.innerText = socket.id;
+            })
+
+
+
+
+            socket.on("users", (allUsersId) => {
+                allUsers = document.getElementById("all-users");
+                allUsers.innerHTML = "";
+
+                allUsersId.forEach((ele, ind) => {
+                    allUsers.innerHTML += ` <h3>${ele} </h3>`;
+                });
+
+                console.log(allUsersId);
             })
 
 
@@ -44,18 +65,28 @@
             const msg = document.getElementById("send-msg");
             const id = document.getElementById("send-id");
 
+            function userId() {
+                let sendId = id.value;
+                socket.emit("register", sendId);
+            }
 
             function sendMessage() {
-                const sendMsg = msg.value;
-                const sendId = id.value;
+                let sendMsg = msg.value;
+                let sendId = id.value;
+
                 // msg.value = "";
                 // id.value = "";
                 // console.log({ sendMsg, sendId });
-                socket.emit("chat", { sendMsg, sendId });
+                var date = new Date();
+                var nowDate = (date.toISOString().split("T")[0]);
+                var nowTime = (date.toTimeString().split(" ")[0]);
+                socket.emit("chat", { sendMsg, sendId, nowTime, nowDate });
+
             }
-            
+
             socket.on("message", (data) => {
-                console.log({ data });
+                console.log(data);
+                console.log("recieved.........");
             })
 
 
